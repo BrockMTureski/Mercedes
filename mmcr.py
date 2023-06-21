@@ -237,4 +237,4 @@ def daysBetween(expiry):
     return expiry
 
 
-checkServices()
+#checkServices()

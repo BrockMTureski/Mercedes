@@ -48,7 +48,7 @@ def HTMLtoExcel(HTML,date,indexstart=0):
     return df
 
 
-def getSchedule(driver):
+def getSchedule(driver,email=email,password=password):
     """Gets service appointment table from Eleads and filters out any appointments that
      the vehicle is not a 2019-2022 (only 2019-2022 can possibly have expired services)"""
     
@@ -287,6 +287,6 @@ def pullEmails(driver,df):
     #close selenium instances
     driver.quit()
 
-driver = webdriver.Chrome()
-df,driver = getSchedule(driver)
-pullEmails(driver,df)
+#driver = webdriver.Chrome()
+#df,driver = getSchedule(driver)
+#pullEmails(driver,df)
