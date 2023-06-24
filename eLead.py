@@ -287,6 +287,8 @@ def pullEmails(driver,df):
     #close selenium instances
     driver.quit()
 
-#driver = webdriver.Chrome()
-#df,driver = getSchedule(driver)
-#pullEmails(driver,df)
+
+def elead(email,password):
+    driver = webdriver.Chrome()
+    df,driver = getSchedule(driver,email=email,password=password)
+    pullEmails(driver,df)
