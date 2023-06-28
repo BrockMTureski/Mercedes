@@ -176,6 +176,11 @@ def pullEmails(driver,df):
     #enumerate so we can reference VIN list aswell
     for i,name in enumerate(nameList):
         
+        if len(driver.window_handles)>1:
+                driver.switch_to.window(driver.window_handles[1])
+                driver.close()
+                driver.switch_to.window(driver.window_handles[0])
+        
         #wait until searchbar is available, send keys, then search
         searchBar = WebDriverWait(driver,20).until(ec.presence_of_element_located((By.ID,"txtQuickSearch")))
         searchBar.send_keys(name)
