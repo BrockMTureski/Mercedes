@@ -8,9 +8,6 @@ import time
 from datetime import date
 import requests
 
-
-user = ""
-password = ""
 netStar = "https://netstar.i.mercedes-benz.com/"
 mmcr = "https://mmcr-amap.i.daimler.com/MMCR/"
 
@@ -44,7 +41,7 @@ def login(driver,user,password):
     return driver
 
 
-def checkServices(user=user,password=password):
+def checkServices(user=None,password=None):
     """Function for scraping service status off of MMCR, used in conjunction with Elead module's output table."""
 
     driver = webdriver.Chrome()

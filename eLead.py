@@ -10,8 +10,6 @@ import datetime
 
 
 loginPage = "https://www.eleadcrm.com/evo2/fresh/login.asp"
-email = ""
-password = ""
 Appointments = "https://www.eleadcrm.com/evo2/fresh/eLead-V45/elead_track/servicesched/serviceappointments.aspx"
 iframe = "https://www.eleadcrm.com/evo2/fresh/eLead-V45/elead_track/search/searchresults.asp?Go=2&searchexternal=&corpStore=False&st=0&lIUID=&etitle=&lDID=&PID=&origStrDo=#"
 dayOneHTML = None
@@ -48,7 +46,7 @@ def HTMLtoExcel(HTML,date,indexstart=0):
     return df
 
 
-def getSchedule(driver,email=email,password=password):
+def getSchedule(driver,email=None,password=None):
     """Gets service appointment table from Eleads and filters out any appointments that
      the vehicle is not a 2019-2022 (only 2019-2022 can possibly have expired services)"""
     
