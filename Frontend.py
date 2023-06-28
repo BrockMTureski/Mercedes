@@ -60,5 +60,3 @@ class gui:
                 mmcr.checkServices(user=user,password=password)
             except:
                 print("ERROR: Please Try Again")
-
-gui()

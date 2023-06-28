@@ -235,6 +235,3 @@ def daysBetween(expiry):
             dayNum = (d - today).days
             expiry[i] = str(expiry[i])[0:10] +' (' + str(dayNum) + ' days)'
     return expiry
-
-
-#checkServices()
