@@ -14,6 +14,7 @@ Appointments = "https://www.eleadcrm.com/evo2/fresh/eLead-V45/elead_track/servic
 iframe = "https://www.eleadcrm.com/evo2/fresh/eLead-V45/elead_track/search/searchresults.asp?Go=2&searchexternal=&corpStore=False&st=0&lIUID=&etitle=&lDID=&PID=&origStrDo=#"
 dayOneHTML = None
 dayTwoHTML = None
+USWorkHoldays = ["01-01", "07-04", "09-09", "11-11", "08-16", "01-21", "02-22", "12-25", "11-26", "05-30"]
 
 
 def HTMLtoExcel(HTML,date,indexstart=0):
@@ -51,7 +52,8 @@ def getSchedule(driver,email=None,password=None):
      the vehicle is not a 2019-2022 (only 2019-2022 can possibly have expired services)"""
     
     #figure out the two next business days of the week to grab
-    days = getDays()
+    dayOne,dayTwo = getDate()
+    days = [dayOne.isoweekday(),dayTwo.isoweekday()]
     
     #login process
     driver.get(loginPage)
@@ -103,29 +105,12 @@ def getSchedule(driver,email=None,password=None):
     dayTwoHTML = appointmentTable.get_attribute("innerHTML")
 
     #parse and filter table, then store in excel sheet
-    df1 = HTMLtoExcel(dayOneHTML, str(getDate(1)))
+    df1 = HTMLtoExcel(dayOneHTML, str(dayOne))
     df1s = df1.shape
-    df2 = HTMLtoExcel(dayTwoHTML, str(getDate(2)),indexstart=df1s[0])
+    df2 = HTMLtoExcel(dayTwoHTML, str(dayTwo),indexstart=df1s[0])
     df = pd.concat([df1,df2],verify_integrity=True)
 
     return df,driver
-    
-
-def getDays():
-    """determine next two business days (skips sat and sun)"""
-
-    today = datetime.date.today()
-    if today.isoweekday() == 4:
-        dayOne = 5
-        dayTwo = 1
-    elif today.isoweekday() == 5:
-        dayOne = 1
-        dayTwo = 2
-    else:
-        dayOne = today.isoweekday() + 1
-        dayTwo = today.isoweekday() + 2
-    days = [dayOne,dayTwo]
-    return days
 
 
 def getDayButton(ChromeDriver,day):
@@ -144,16 +129,37 @@ def getDayButton(ChromeDriver,day):
     return element
 
 
-def getDate(offset):
+def getDate():
     """Grabs next business date according to offset (if offset is 2 and today is thursday, returns monday's date)"""
     today = datetime.date.today()
-    if offset == 1 and today.isoweekday() == 5:
-        date = today + datetime.timedelta(days=3)
-    elif offset == 2 and (today.isoweekday() == 5 or today.isoweekday() == 4):
-        date = today + datetime.timedelta(days=4)
-    else:
-        date = today + datetime.timedelta(days=offset)
-    return date
+    offset = 1
+    
+    while(True):
+        if offset == 1 and today.isoweekday() == 5:
+            dateOne = today + datetime.timedelta(days=3)
+        else:
+            dateOne = today + datetime.timedelta(days=offset)
+        HolidayCheck = dateOne.strftime('%m-%d')
+        
+        if USWorkHoldays.count(HolidayCheck):
+            today = dateOne
+        else:
+            break
+
+    today = dateOne
+    while(True):
+        if offset == 1 and today.isoweekday() == 5:
+            dateTwo = today + datetime.timedelta(days=3)
+        else:
+            dateTwo = today + datetime.timedelta(days=offset)
+        HolidayCheck = dateTwo.strftime('%m-%d')
+        
+        if USWorkHoldays.count(HolidayCheck):
+            today = dateTwo
+        else:
+            break
+
+    return dateOne,dateTwo
 
 
 def pullEmails(driver,df):
