@@ -2,7 +2,7 @@
 
 ## How to Install
 clone the repository using the following command once in the directory you choose you want it cloned to:
-```git clone {insert http link}```
+```git clone https://github.com/BrockMTureski/Mercedes.git```
 If you don't have git [here is a tutorial on how to download it.](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 Once the repository is cloned we must ensure that the chromedriver.exe file in the dist folder is of the same version as your version of chrome.
 For example, if you have chrome version 114 downloaded you must get chromedriver version 114. If you don't know how to check your version of chrome
