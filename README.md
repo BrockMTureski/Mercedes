@@ -10,7 +10,7 @@ For example, if you have chrome version 114 downloaded you must get chromedriver
 Your best bet is to update chrome to the latest version and then download the latest version of the chromedriver. [Here is a link to the chromedriver downloads](https://chromedriver.chromium.org/downloads).
 Once you download your new chromedriver unzip that file and find the file inside named chromedriver.exe, once you find it you can delete the chromedriver.exe file
 that came with the git download and put the new one you downloaded in place of that (if you are on chrome v114 you can keep it in as it is a copy of chromedriver 114).
-once you have you chromedriver in the dist file you should be able to 
+once you have you chromedriver in the dist file you should be able to run the mercedes.exe file successfully.
 
 ## How The Scraper Works
 The Eleads program collects the next two days service appointments and then filters out any car not between a 2019 and a 2023. It then goes and searces
