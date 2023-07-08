@@ -137,6 +137,10 @@ def getDate():
     while(True):
         if offset == 1 and today.isoweekday() == 5:
             dateOne = today + datetime.timedelta(days=3)
+        elif offset == 1 and today.isoweekday() == 6:
+            dateOne = today + datetime.timedelta(days=2)
+        elif offset == 1 and today.isoweekday() == 7:
+            dateOne = today + datetime.timedelta(days=1)
         else:
             dateOne = today + datetime.timedelta(days=offset)
         HolidayCheck = dateOne.strftime('%m-%d')
@@ -150,6 +154,10 @@ def getDate():
     while(True):
         if offset == 1 and today.isoweekday() == 5:
             dateTwo = today + datetime.timedelta(days=3)
+        elif offset == 1 and today.isoweekday() == 6:
+            dateTwo = today + datetime.timedelta(days=2)
+        elif offset == 1 and today.isoweekday() == 7:
+            dateTwo = today + datetime.timedelta(days=1)
         else:
             dateTwo = today + datetime.timedelta(days=offset)
         HolidayCheck = dateTwo.strftime('%m-%d')

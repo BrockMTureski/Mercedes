@@ -77,7 +77,7 @@ def checkServices(user=None,password=None):
                 #go to account search screen
                 try:
                     #sc-gzrROc jzOepy sc-fmPOXC gqHAVM active
-                    accountLink = WebDriverWait(driver,15).until(ec.presence_of_element_located((By.ID,"sc-gzrROc jzOepy sc-fmPOXC gqHAVM active")))
+                    accountLink = WebDriverWait(driver,4).until(ec.presence_of_element_located((By.XPATH,"/html/body/div[1]/header/div/div[2]/div[1]/div/a[1]")))
                     accountLink.click()
                 except:
                     pass
@@ -85,20 +85,50 @@ def checkServices(user=None,password=None):
                 #search email
                 usernameElement = WebDriverWait(driver,10).until(ec.presence_of_element_located((By.ID,"ME_ID_DASHBOARD")))
                 usernameElement.send_keys(e)
-                searchButton = driver.find_element(By.ID,"sc-laZRCg gaooqp")
-                searchButton.click()
-
                 try:
-                    #wait for vehicles tab to popup (if found this means we found a profile)
-                    vehicleTable = WebDriverWait(driver,4).until(ec.presence_of_element_located((By.ID,"sc-hZNxer dcaJSz")))
+                    searchButton = WebDriverWait(driver,2).until(ec.presence_of_element_located((By.XPATH,"/html/body/div[1]/div[2]/div/div/div[2]/div/div[2]/div/div[2]/div/form/div[2]/div[2]/button")))
+                    searchButton.click()
+                except:
+                    print("Incorrect email formatting")
+
+
+                #wait for vehicles tab to popup (if found this means we found a profile)
+                try:
+                    time.sleep(4)
+                    check = driver.current_url
+                    if check != "https://mmcr-amap.i.daimler.com/account":
+                        raise Exception("Account Not Found")
+                    print(check)
+                    #try:
+                    #    driver.find(By.ID,"ME_ID_DASHBOARD")
+                    #except:
+                    #    raise Exception("No account found.")
+                    
+                    vehicleTable = WebDriverWait(driver,5).until(ec.presence_of_element_located((By.XPATH,"/html/body/div[1]/div/div[2]/div/div/div[2]/div[1]/div[2]/table")))
                     vehicleTableSoup = bs(vehicleTable.get_attribute("innerHTML"),'html.parser')
                     tbody = vehicleTableSoup.find("tbody")
-                    tableRow = 0
+                    row = None
 
-                    for tr in tbody.findAll("tr"):
-                        pass
+                    for num,tr in enumerate(tbody.findAll("tr")):
+                        if tr.findAll("th")[1].text == vinList[i]:
+                            print("found")
+                            row = num+1
 
-                except:
+                    if row is not None:
+                        xpath = "/html/body/div[1]/div/div[2]/div/div/div[2]/div[1]/div[2]/table/tbody/tr[" + str(row) + "]/th[7]/a"
+                        vehicleButton = driver.find_element(By.XPATH, xpath)
+                        vehicleButton.click()
+                        
+                        serviceTable = WebDriverWait(driver,5).until(ec.presence_of_element_located((By.CLASS_NAME,"sc-hZNxer cTyWSA")))
+                        serviceTableSoup = bs(serviceTable.get_attribute("innerHTML"),'html.parser')
+                        serviceTableRows = serviceTableSoup.find("tbody").find_all("tr")
+                        for row in serviceTableRows:
+                            #find if activated
+                            pass
+
+
+                except Exception as e:
+                    print(e)
                     #if no profile is found exception is thrown and we handle according to what went wrong
                     #src = driver.page_source
                     #soup = bs(src,'html.parser')
