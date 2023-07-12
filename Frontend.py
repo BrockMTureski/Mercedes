@@ -2,9 +2,9 @@ import eLead
 import mmcr
 from tkinter import *
 from tkinter.ttk import *
+import mmcr2
 
 class gui:
-
 
     def __init__(self):
 
@@ -21,7 +21,7 @@ class gui:
 
         self.__dropDownLabel = Label(self.__window,text="Mode",background="gray17",foreground="white")
         self.__dropDownLabel.grid(row=2,column=0)
-        self.__dropDown = Combobox(state="readonly",values=["Eleads","MMCR"])
+        self.__dropDown = Combobox(state="readonly",values=["Eleads","MMCR 1.0","MMCR 2.0"])
         self.__dropDown.grid(row=2,column=1)
         Label(self.__window,text="",background="gray17").grid(row=3)
 
@@ -41,7 +41,6 @@ class gui:
         self.__submitButton.grid(row=8,column=1)
 
         self.__window.mainloop()
-
     
     def __buttonFunction(self):
         
@@ -50,13 +49,19 @@ class gui:
         password = self.__passswordEntry.get()
 
         if mode == "Eleads":
-            try:
-                eLead.elead(user,password)
-            except:
-                print("ERROR: Please Try Again")
+            
+            eLead.elead(user,password)
+            #except:
+            #    print("ERROR: Please Try Again")
         
-        if mode == "MMCR":
+        if mode == "MMCR 1.0":
             try:
                 mmcr.checkServices(user=user,password=password)
+            except:
+                print("ERROR: Please Try Again")
+
+        if mode == "MMCR 2.0":
+            try:
+                mmcr2.checkServices(user=user,password=password)
             except:
                 print("ERROR: Please Try Again")

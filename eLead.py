@@ -240,16 +240,16 @@ def pullEmails(driver,df):
                     src = driver.page_source
                     soup = bs(src, 'html.parser')
                     scripts = soup.find_all('script',type="text/javascript")
-                    scripts=scripts[52].text
+                    scripts=scripts[-2].text
                     split = scripts.split("var g_data = {")[1]
                     g_data = split.split("}",1)[0]
                 except:
                     #error handling incase we grab source code too early, waits 5s then tries again
-                    time.sleep(5)
+                    driver.implicitly_wait(10)
                     src = driver.page_source
                     soup = bs(src, 'html.parser')
                     scripts = soup.find_all('script',type="text/javascript")
-                    scripts=scripts[52].text
+                    scripts=scripts[-2].text
                     split = scripts.split("var g_data = {")[1]
                     g_data = split.split("}",1)[0]
                 primaryEmail = g_data.split("PrimaryEmail:")[1][1:].split("\"")[0]

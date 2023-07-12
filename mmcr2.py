@@ -32,14 +32,6 @@ def login(driver,user,password):
     loginButton = driver.find_element(By.ID,"loginSubmitButton")
     loginButton.click()
 
-    #wait for cookie banner to popup (website loaded at that point), close banner once element available
-    
-    #closeButton = WebDriverWait(driver,45).until(ec.presence_of_element_located((By.CLASS_NAME,"cookiebanner-close")))
-    #action = webdriver.common.action_chains.ActionChains(driver)
-    #action.move_to_element_with_offset(closeButton, 0, 0)
-    #action.click()
-    #action.perform()
-
     return driver
 
 
@@ -76,7 +68,6 @@ def checkServices(user=None,password=None):
                     break
                 #go to account search screen
                 try:
-                    #sc-gzrROc jzOepy sc-fmPOXC gqHAVM active
                     accountLink = WebDriverWait(driver,4).until(ec.presence_of_element_located((By.XPATH,"/html/body/div[1]/header/div/div[2]/div[1]/div/a[1]")))
                     accountLink.click()
                 except:
@@ -86,7 +77,7 @@ def checkServices(user=None,password=None):
                 usernameElement = WebDriverWait(driver,10).until(ec.presence_of_element_located((By.ID,"ME_ID_DASHBOARD")))
                 usernameElement.send_keys(e)
                 try:
-                    searchButton = WebDriverWait(driver,2).until(ec.presence_of_element_located((By.XPATH,"/html/body/div[1]/div[2]/div/div/div[2]/div/div[2]/div/div[2]/div/form/div[2]/div[2]/button")))
+                    searchButton = WebDriverWait(driver,1).until(ec.presence_of_element_located((By.XPATH,"/html/body/div[1]/div[2]/div/div/div[2]/div/div[2]/div/div[2]/div/form/div[2]/div[2]/button")))
                     searchButton.click()
                 except:
                     print("Incorrect email formatting")
@@ -98,20 +89,14 @@ def checkServices(user=None,password=None):
                     check = driver.current_url
                     if check != "https://mmcr-amap.i.daimler.com/account":
                         raise Exception("Account Not Found")
-                    print(check)
-                    #try:
-                    #    driver.find(By.ID,"ME_ID_DASHBOARD")
-                    #except:
-                    #    raise Exception("No account found.")
                     
-                    vehicleTable = WebDriverWait(driver,5).until(ec.presence_of_element_located((By.XPATH,"/html/body/div[1]/div/div[2]/div/div/div[2]/div[1]/div[2]/table")))
+                    vehicleTable = WebDriverWait(driver,10).until(ec.presence_of_element_located((By.XPATH,"/html/body/div[1]/div/div[2]/div/div/div[2]/div[1]/div[2]/table")))
                     vehicleTableSoup = bs(vehicleTable.get_attribute("innerHTML"),'html.parser')
                     tbody = vehicleTableSoup.find("tbody")
                     row = None
 
                     for num,tr in enumerate(tbody.findAll("tr")):
                         if tr.findAll("th")[1].text == vinList[i]:
-                            print("found")
                             row = num+1
 
                     if row is not None:
@@ -119,28 +104,39 @@ def checkServices(user=None,password=None):
                         vehicleButton = driver.find_element(By.XPATH, xpath)
                         vehicleButton.click()
                         
-                        serviceTable = WebDriverWait(driver,5).until(ec.presence_of_element_located((By.CLASS_NAME,"sc-hZNxer cTyWSA")))
+                        serviceTable = WebDriverWait(driver,8).until(ec.presence_of_element_located((By.XPATH,"/html/body/div[1]/div/div[2]/div/div[4]/div/div[2]/div/div[2]/div[1]/table/tbody")))
                         serviceTableSoup = bs(serviceTable.get_attribute("innerHTML"),'html.parser')
-                        serviceTableRows = serviceTableSoup.find("tbody").find_all("tr")
+                        serviceTableRows = serviceTableSoup.find_all("tr")
                         for row in serviceTableRows:
-                            #find if activated
-                            pass
-
+                            data = row.find_all("th")
+                            if data[1].text == "Remote Door Lock & Unlock":
+                                if len(data[3].text) != 0:
+                                    if data[2].text == " Information required":
+                                        statusTemp = "Actived (Profile Requires Attention)"
+                                    else:
+                                        statusTemp = "Activated"
+                                    expiry = data[3].text[-10:]     
+                                else:
+                                    statusTemp = "Deactivated"
+                                break
 
                 except Exception as e:
-                    print(e)
-                    #if no profile is found exception is thrown and we handle according to what went wrong
-                    #src = driver.page_source
-                    #soup = bs(src,'html.parser')
-                    #if soup.find("div",class_="modal modal-alert-mini fade in show"):
-                    #    #profile missing details, in this case that is their profile so we can stop searching for their other possible emails
-                    #    closePopup = driver.find_element(By.ID, "mmcr:confirmMissingProfileFields:close:command")
-                    #    closePopup.click()
-                    #    statusTemp = "MMCR profile requires update"
-                    #    break
                     try:
-                        closePopup = WebDriverWait(driver,1).until(ec.presence_of_element_located((By.CLASS_NAME,"sc-laZRCg durlsR")))
+                        closePopup = WebDriverWait(driver,1).until(ec.presence_of_element_located((By.XPATH,"/html/body/div[6]/div/div/footer/div[1]/button")))
                         closePopup.click()
-                        continue
+                        statusTemp = "MMCR Profile Requires Update"
                     except:
                         continue
+
+        if statusTemp=="":
+            statusTemp = "?"
+        if expiry == "":
+            expiry = "N/A"
+        statusList.append(statusTemp)
+        expiryList.append(expiry)
+        
+    df["Status"] = statusList
+    df["Expiry"] = mmcr.daysBetween(expiryList)
+
+    with pd.ExcelWriter("status2.xlsx",mode="w") as writer:
+        df.to_excel(excel_writer = writer,index=False)

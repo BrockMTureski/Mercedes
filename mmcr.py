@@ -210,7 +210,7 @@ def checkServices(user=None,password=None):
     df['Expiry'] = daysBetween(expiryList)
 
     #send find dataframe to excel
-    with pd.ExcelWriter("status.xlsx",mode="w") as writer:
+    with pd.ExcelWriter("status1.xlsx",mode="w") as writer:
         df.to_excel(excel_writer = writer,index=False)
 
 
