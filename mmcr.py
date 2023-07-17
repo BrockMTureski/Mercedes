@@ -103,10 +103,15 @@ def checkServices(user=None,password=None):
                     soup = bs(src,'html.parser')
                     if soup.find("div",class_="modal modal-alert-mini fade in show"):
                         #profile missing details, in this case that is their profile so we can stop searching for their other possible emails
-                        closePopup = driver.find_element(By.ID, "mmcr:confirmMissingProfileFields:close:command")
-                        closePopup.click()
-                        statusTemp = "MMCR profile requires update"
-                        break
+                        try:
+                            closePopup = driver.find_element(By.ID, "mmcr:confirmMissingProfileFields:close:command")
+                            closePopup.click()
+                            statusTemp = "MMCR profile requires update"
+                            break
+                        except:
+                            closePopup = driver.find_element(By.ID,"mmcr:message:close:command")
+                            closePopup.click()
+                            continue
 
                     elif soup.find("div",class_="modal-content"):
                         #Incorrect email format
