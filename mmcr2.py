@@ -8,7 +8,6 @@ from selenium.webdriver.support import expected_conditions as ec
 import time
 from datetime import date
 
-
 mmcr2 = "https://mmcr-amap.i.daimler.com"
 
 
@@ -32,6 +31,8 @@ def login(driver,user,password):
     loginButton = driver.find_element(By.ID,"loginSubmitButton")
     loginButton.click()
 
+    driver.maximize_window()
+
     return driver
 
 
@@ -44,6 +45,7 @@ def checkServices(user=None,password=None):
     df = pd.read_excel(r'out.xlsx')
     emailList = df['Email(s)'].to_list()
     vinList = df['VIN'].to_list()
+    nameList = df['Customer Name'].to_list()
     statusList = []
     expiryList = []
 
@@ -134,9 +136,68 @@ def checkServices(user=None,password=None):
             expiry = "N/A"
         statusList.append(statusTemp)
         expiryList.append(expiry)
-        
+    
+    for index,status in enumerate(statusList):
+        if status == '?':
+
+            accountLink = WebDriverWait(driver,4).until(ec.presence_of_element_located((By.XPATH,"/html/body/div[1]/header/div/div[2]/div[1]/div/a[1]")))
+            accountLink.click()
+            
+            vinSearch = WebDriverWait(driver,4).until(ec.presence_of_element_located((By.XPATH,"/html/body/div[1]/div[2]/div/div/div[2]/div/div[2]/div/div[1]/ol/button[3]")))
+            vinSearch.click()
+            vinInput = WebDriverWait(driver,4).until(ec.presence_of_element_located((By.XPATH,"/html/body/div[1]/div[2]/div/div/div[2]/div/div[2]/div/div[2]/div/div/form/div[1]/div/div/div/input")))
+            vinInput.send_keys(vinList[index])
+            fullName = nameList[index].split()
+            if len(fullName)<2:
+                statusList[index] = "Error: Name Length"
+                continue
+            try:
+                time.sleep(3)
+                firstNameInput = WebDriverWait(driver,2).until(ec.presence_of_element_located((By.XPATH,"/html/body/div[1]/div[2]/div/div/div[2]/div/div[2]/div/div[2]/div/div/form/div[2]/div[1]/div/div/input")))
+                lastNameInput = WebDriverWait(driver,2).until(ec.presence_of_element_located((By.XPATH,"/html/body/div[1]/div[2]/div/div/div[2]/div/div[2]/div/div[2]/div/div/form/div[2]/div[2]/div/div/input")))
+                firstNameInput.send_keys(fullName[0])
+                lastNameInput.send_keys(fullName[1])
+                
+            except:
+                statusList[index] = "Not Paired"
+                continue
+            search = WebDriverWait(driver,2).until(ec.presence_of_element_located((By.XPATH,"/html/body/div[1]/div[2]/div/div/div[2]/div/div[2]/div/div[2]/div/div/form/div[3]/button")))
+            search.click()
+            try:
+                serviceTable = WebDriverWait(driver,7).until(ec.presence_of_element_located((By.XPATH,"/html/body/div[1]/div/div[2]/div/div[4]/div/div[2]/div/div[2]/div[1]/table/tbody")))
+                serviceTableSoup = bs(serviceTable.get_attribute("innerHTML"),'html.parser')
+                serviceTableRows = serviceTableSoup.find_all("tr")
+                for row in serviceTableRows:
+                    data = row.find_all("th")
+                    if data[1].text == "Remote Door Lock & Unlock":
+                        if len(data[3].text) != 0:
+                            if data[2].text == " Information required":
+                                statusList[index] = "Actived (Profile Requires Attention)"
+                            else:
+                                statusList[index] = "Activated"
+                            expiryList[index] = data[3].text[-10:]     
+                        else:
+                            statusList[index] = "Deactivated"
+                        continue
+            except:
+                pass
+    dropList = []
+    for i,expiry in enumerate(expiryList):
+        if expiry!='N/A':
+            split = expiry.split('/')
+            split[2] = split[2][:4]
+            year = int(split[2])
+            month = int(split[0])
+            day = int(split[1])
+            dayy = date(year,month,day)
+            today = dayy.today()
+            if (dayy-today).days>90:
+                dropList.append(i)
+
     df["Status"] = statusList
     df["Expiry"] = mmcr.daysBetween(expiryList)
+
+    df = df.drop(index=dropList)
 
     with pd.ExcelWriter("status2.xlsx",mode="w") as writer:
         df.to_excel(excel_writer = writer,index=False)

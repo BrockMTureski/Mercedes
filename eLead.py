@@ -173,9 +173,7 @@ def getDate():
 def pullEmails(driver,df):
     """Navigates Eleads and searches for all of the names in the service appointment dataframe, grabs all emails associated with the account if the 
     correct VIN is linked to the Eleads account."""
-
-    #read in excel data
-    #df = pd.read_excel(r'out.xlsx')
+    
     #go back from service appointment so that searchbar is available
     driver.back()
 

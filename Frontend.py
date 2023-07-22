@@ -64,5 +64,6 @@ class gui:
         if mode == "MMCR 2.0":
             try:
                 mmcr2.checkServices(user=user,password=password)
-            except:
+            except Exception as e:
+                print(e)
                 print("ERROR: Please Try Again")
