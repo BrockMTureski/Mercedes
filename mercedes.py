@@ -1,5 +1,5 @@
-import Frontend
+import headless
 
 
 if __name__ == "__main__":
-    Frontend.gui()
+    headless.main()

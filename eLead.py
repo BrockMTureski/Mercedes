@@ -110,7 +110,7 @@ def getSchedule(driver,email=None,password=None):
     df2 = HTMLtoExcel(dayTwoHTML, str(dayTwo),indexstart=df1s[0])
     df = pd.concat([df1,df2],verify_integrity=True)
 
-    return df,driver
+    return df
 
 
 def getDayButton(ChromeDriver,day):
