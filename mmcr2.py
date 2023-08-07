@@ -7,6 +7,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 import time
 from datetime import date
+from requestium import Session,Keys
 
 mmcr2 = "https://mmcr-amap.i.daimler.com"
 
@@ -89,7 +90,7 @@ def checkServices(user=None,password=None):
                 try:
                     time.sleep(4)
                     check = driver.current_url
-                    if check != "https://mmcr-amap.i.daimler.com/account":
+                    if check != "https://mmcr-amap.i.mercedes-benz.com/account":
                         raise Exception("Account Not Found")
                     
                     vehicleTable = WebDriverWait(driver,10).until(ec.presence_of_element_located((By.XPATH,"/html/body/div[1]/div/div[2]/div/div/div[2]/div[1]/div[2]/table")))
@@ -106,7 +107,7 @@ def checkServices(user=None,password=None):
                         vehicleButton = driver.find_element(By.XPATH, xpath)
                         vehicleButton.click()
                         
-                        serviceTable = WebDriverWait(driver,8).until(ec.presence_of_element_located((By.XPATH,"/html/body/div[1]/div/div[2]/div/div[4]/div/div[2]/div/div[2]/div[1]/table/tbody")))
+                        serviceTable = WebDriverWait(driver,8).until(ec.presence_of_element_located((By.XPATH,"/html/body/div[1]/div/div[2]/div/div[4]/div/div[2]/div/div[1]/div/div/div[3]/table/tbody")))
                         serviceTableSoup = bs(serviceTable.get_attribute("innerHTML"),'html.parser')
                         serviceTableRows = serviceTableSoup.find_all("tr")
                         for row in serviceTableRows:
@@ -129,7 +130,6 @@ def checkServices(user=None,password=None):
                         statusTemp = "MMCR Profile Requires Update"
                     except:
                         continue
-
         if statusTemp=="":
             statusTemp = "?"
         if expiry == "":
