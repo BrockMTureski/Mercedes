@@ -154,7 +154,7 @@ def main():
 
     df = df.drop(index=dropList)
     df = df.drop(['VIN'],axis=1)
-    df.sort_values(by='Service Rep', inplace=True)
+    df.sort_values(by='Service Rep', inplace=True, kind='stable')
     idxList = []
     repList = df["Service Rep"].to_list()
     prevRep = ""
