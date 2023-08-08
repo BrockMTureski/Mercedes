@@ -1,12 +1,16 @@
 from selenium import webdriver
 from requestium import Session
-import time
+from time import sleep
 import eLead
 import pandas as pd
 import json
 from datetime import date
+from openpyxl import load_workbook
+from openpyxl.styles.borders import Border, Side
+from openpyxl.styles import Alignment
 
 mmcr = "https://mmcr-amap.i.daimler.com"
+
 
 def loginDDA(s,user,password):
     """Helper function for logging into MMCR."""
@@ -18,7 +22,7 @@ def loginDDA(s,user,password):
     s.driver.ensure_element_by_id("next-btn").click()
     s.driver.ensure_element_by_id("password").send_keys(password)
     s.driver.ensure_element_by_id("loginSubmitButton").click()
-    time.sleep(6)
+    sleep(6)
     s.copy_user_agent_from_driver()
     s.transfer_driver_cookies_to_session()
     s.driver.minimize_window()
@@ -32,6 +36,7 @@ def vinSearch(s,vin):
 
     r = s.get("https://mmcr-amap.i.mercedes-benz.com/api/vehicles?finOrVin="+vin+"&country=US&language=en-US")
     if r.status_code!=200:
+        status = "Bad Response"
         return status,expiry
     else:
         respJSON = json.loads(r.content)
@@ -80,6 +85,27 @@ def daysBetween(expiry):
     return expiry
 
 
+def organize(indexList, path='out.xlsx'):
+
+    wb = load_workbook(path)
+    sheet = wb.active
+    thin_border = Border(left=Side(style='thin'), 
+                     right=Side(style='thin'), 
+                     top=Side(style='thin'), 
+                     bottom=Side(style='thin'))
+    b = sheet['A1':'G'+str(sheet.max_row)]
+
+    for cell in b:
+        for x in cell:
+            x.border=thin_border
+            x.alignment = Alignment(horizontal='center')
+
+    for offset,i in enumerate(indexList):
+        sheet.insert_rows(i + offset)
+        
+    wb.save(path)
+
+
 def main():
     email = input("Please input your email (ending in @mbnaples.com):")
     username = input("Please input your netstar email (starting with D7):")
@@ -95,14 +121,19 @@ def main():
     statusList = []
     expiryList = []
 
-
     s = Session(webdriver_path='./chromedriver',driver=driver)
     s = loginDDA(s,username,mPassword)
-
+    print(" ")
     for v in vinList:
         statusTemp,expiryTemp = vinSearch(s,v)
         statusList.append(statusTemp)
-        print(v + ": " + statusTemp)
+        if statusTemp == "Bad Response" or statusTemp == '?':
+            print("\033[91m {}\033[00m" .format(v + ": " + statusTemp))
+        elif statusTemp == "Not Paired":
+            print("\033[93m {}\033[00m" .format(v + ": " + statusTemp))
+        else:
+            print("\033[92m {}\033[00m" .format(v + ": " + statusTemp))
+
         expiryList.append(expiryTemp)
 
     dropList = []
@@ -123,6 +154,24 @@ def main():
 
     df = df.drop(index=dropList)
     df = df.drop(['VIN'],axis=1)
+    df.sort_values(by='Service Rep', inplace=True)
+    idxList = []
+    repList = df["Service Rep"].to_list()
+    prevRep = ""
 
-    with pd.ExcelWriter("out.xlsx",mode="w") as writer:
-        df.to_excel(excel_writer = writer,index=False)
+    for idx,currentRep in enumerate(repList):
+        if currentRep != prevRep:
+            prevRep = currentRep
+            if idx != 0:
+                idxList.append(idx+2)
+
+    print(" ")
+    try:
+        with pd.ExcelWriter("out.xlsx",mode="w") as writer:
+            df.to_excel(excel_writer = writer,index=False)
+        print("\033[92m {}\033[00m" .format("Successfully Saved To: out.xlsx"))
+    except:
+        print("\033[91m {}\033[00m" .format("Failed to write to excel file. Please ensure out.xlsx is not open whilst running"))
+        sleep(5)
+
+    organize(idxList)

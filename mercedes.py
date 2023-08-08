@@ -1,5 +1,5 @@
-import headless
+import mmcr
 
 
 if __name__ == "__main__":
-    headless.main()
+    mmcr.main()
