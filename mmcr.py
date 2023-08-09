@@ -128,11 +128,11 @@ def main():
         statusTemp,expiryTemp = vinSearch(s,v)
         statusList.append(statusTemp)
         if statusTemp == "Bad Response" or statusTemp == '?':
-            print("\033[91m {}\033[00m" .format(v + ": " + statusTemp))
+            print(v + ": " + statusTemp)
         elif statusTemp == "Not Paired":
-            print("\033[93m {}\033[00m" .format(v + ": " + statusTemp))
+            print(v + ": " + statusTemp)
         else:
-            print("\033[92m {}\033[00m" .format(v + ": " + statusTemp))
+            print(v + ": " + statusTemp)
 
         expiryList.append(expiryTemp)
 
@@ -169,9 +169,9 @@ def main():
     try:
         with pd.ExcelWriter("out.xlsx",mode="w") as writer:
             df.to_excel(excel_writer = writer,index=False)
-        print("\033[92m {}\033[00m" .format("Successfully Saved To: out.xlsx"))
+        print("Successfully Saved To: out.xlsx")
     except:
-        print("\033[91m {}\033[00m" .format("Failed to write to excel file. Please ensure out.xlsx is not open whilst running"))
+        print("Failed to write to excel file. Please ensure out.xlsx is not open whilst running")
         sleep(5)
 
     organize(idxList)
