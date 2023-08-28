@@ -108,7 +108,7 @@ def organize(indexList, path='out.xlsx'):
 
 def main():
     email = input("Please input your email (ending in @mbnaples.com):")
-    username = input("Please input your netstar email (starting with D7):")
+    username = input("Please input your netstar login (starting with D7):")
     ePassword = input("Please input your eLeads password:")
     mPassword = input("Please input your Netstar password:")
 
