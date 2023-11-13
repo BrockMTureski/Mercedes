@@ -11,7 +11,7 @@ Appointments = "https://www.eleadcrm.com/evo2/fresh/eLead-V45/elead_track/servic
 iframe = "https://www.eleadcrm.com/evo2/fresh/eLead-V45/elead_track/search/searchresults.asp?Go=2&searchexternal=&corpStore=False&st=0&lIUID=&etitle=&lDID=&PID=&origStrDo=#"
 dayOneHTML = None
 dayTwoHTML = None
-USWorkHoldays = ["01-01", "07-04", "09-09", "11-11", "02-22", "12-25", "11-25"]
+USWorkHoldays = ["01-01", "07-04", "09-04", "11-11", "02-22", "12-25", "11-25"]
 
 
 def HTMLtoExcel(HTML,date,indexstart=0):
@@ -143,6 +143,7 @@ def getDate():
         HolidayCheck = dateOne.strftime('%m-%d')
         
         if USWorkHoldays.count(HolidayCheck):
+            print("holiday")
             today = dateOne
         else:
             break
@@ -160,6 +161,7 @@ def getDate():
         HolidayCheck = dateTwo.strftime('%m-%d')
         
         if USWorkHoldays.count(HolidayCheck):
+            print("holiday")
             today = dateTwo
         else:
             break

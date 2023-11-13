@@ -9,7 +9,7 @@ from openpyxl import load_workbook
 from openpyxl.styles.borders import Border, Side
 from openpyxl.styles import Alignment
 
-mmcr = "https://mmcr-amap.i.daimler.com"
+mmcr = "https://mmcr-amap.i.mercedes-benz.com"
 
 
 def loginDDA(s,user,password):
