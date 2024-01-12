@@ -15,6 +15,6 @@ once you have you chromedriver in the dist file you should be able to run the me
 ## How The Scraper Works
 The Eleads program collects the next two days service appointments and then filters out any car not between a 2019 and a 2023. It then goes and searces
 the clients name in Eleads, if the scraper finds the associated vin from the service appointment schedule it grabs all email associated with the
-account this information is then stored in the spreadsheet named "out.xlsx". The MMCR program searches MMCR for the emails found in the Eleads module in MMCR, upon 
-finding an account successfully it will then click on the vehicle and view the status of the vehicles services, it then stores the status of the services and their 
+account this information is then stored in the spreadsheet named "out.xlsx". The MMCR program searches MMCR backend for car matching vin, upon 
+finding car successfully it will then view the status of the vehicles services, it then stores the status of the services and their 
 expiration if necessary. Once all status' are obtained the resulting spreadsheet is saved to "satus.xlsx".
